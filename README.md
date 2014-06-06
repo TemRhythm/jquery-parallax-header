@@ -1,11 +1,6 @@
-# jQuery Plugin Template
-
-A template to simplify jQuery plugin authoring.
+# jQuery parallax header plugin
 
 ## Usage
-
-1. Replace all instances of capitalization with your values.
-2. Write your plugin!
 
 ## License
 
