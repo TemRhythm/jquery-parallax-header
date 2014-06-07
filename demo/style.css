@@ -1,0 +1,19 @@
+body{
+    margin: 0;
+    padding: 0;
+}
+header{
+    background-color: #ffb976;
+    padding: 10px;
+    height: 200px;
+}
+header h1{
+    float: left;
+    margin: 50px 0 0 50px;
+}
+header nav{
+    text-align: right;
+}
+section{
+    padding: 20px;
+}
