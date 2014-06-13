@@ -23,7 +23,9 @@
 
     // Default options for the plugin as a simple object
     var defaults = {
-        minHeight: '30'
+        minHeight: 30,
+	      contentWrapper: '#wrapper',
+	      headerShadowColor: '#000000'
     };
 
     // Plugin constructor
@@ -40,18 +42,43 @@
 
         this._defaults = defaults;
 
-        var meta      = this.$el.data(name + '-opts');
-        this.opts     = $.extend(this._defaults, options, meta);
+        var meta = this.$el.data(name + '-opts');
+        this.opts = $.extend(this._defaults, options, meta);
+
+	      var contentWrapper = $(this.options.contentWrapper);
+		    var toggleHeader = function(needFixHeader){
+			    if(needFixHeader){
+				    headerContainer.css({'position':'fixed','right':'0','left':'0','margin-top':'','top':0, 'z-index':''});
+				    contentWrapper.css('margin-top', +$(document).scrollTop() + +minHeaderHeight + 'px');
+			    }
+			    else{
+				    headerContainer.css({'position':'relative','right':'', left:'0', 'margin-top':$(document).scrollTop(),'top':'', 'z-index':'1'});
+				    contentWrapper.css('margin-top', '');
+			    }
+		    }
 
 		    var headerContainer= this.$el;
 	      var headerContainerOrigHeight = this.$el.height();
+	      var minHeaderHeight = this.options.minHeight;
+	      var headerContainerHeightDiff = headerContainerOrigHeight - minHeaderHeight;
+	      var headerShadowColor = this.options.headerShadowColor;
+	      var shadowContainer = $('<div class="shadowCont"></div>');
+	      headerContainer.css('position', 'relative');
+	      shadowContainer.css({'background-color': headerShadowColor,
+		                          'position': 'absolute',
+		                          'opacity': 0,
+		                          'right': 0,
+	                            'bottom': 0,
+	                            'width': '100%',
+	                            'height': '100%',
+	                            'z-index': '-1'});
+	      headerContainer.append(shadowContainer);
 	      headerContainer.css('overflow','hidden');
-	      var minHeaderHieght = this.options.minHeight;
 		    var lastScrollPos = $(document).scrollTop();
 	      var triggerScrollPos = 0;
 		    $(document).scroll(function(){
 			    var scrollPos = $(this).scrollTop();
-			    console.log(scrollPos);
+			    //console.log(scrollPos);
 			    var nextHeaderContainerHeight = 0;
 			    if(scrollPos>=0){
 				    if(scrollPos <= triggerScrollPos || triggerScrollPos == 0){
@@ -59,32 +86,22 @@
 					      nextHeaderContainerHeight = headerContainerOrigHeight;
 					    else
 					      nextHeaderContainerHeight = headerContainer.height() + lastScrollPos - scrollPos;
-					    if(nextHeaderContainerHeight > minHeaderHieght){
+					    if(nextHeaderContainerHeight > minHeaderHeight){
 						    toggleHeader(false);
 						    headerContainer.height(nextHeaderContainerHeight);
 						    headerContainer.css('margin-top',scrollPos);
 						    triggerScrollPos = 0;
 					    }
-					    else if(headerContainer.height() != minHeaderHieght){
-					      headerContainer.height(minHeaderHieght);
+					    else if(headerContainer.height() != minHeaderHeight){
+					      headerContainer.height(minHeaderHeight);
 					      toggleHeader(true);
 						    triggerScrollPos = scrollPos;
 					    }
 				    }
 				    lastScrollPos = scrollPos;
+				    shadowContainer.css('opacity', 1 - nextHeaderContainerHeight/headerContainerHeightDiff);
 				    }
 		    });
-
-	      var toggleHeader = function(needFixHeader){
-		      if(needFixHeader){
-			      headerContainer.css({'position':'fixed','right':'0','left':'0','margin-top':'','top':0});
-			      $('#wrapper').css('margin-top', +$(document).scrollTop() + +minHeaderHieght + 'px');
-		      }
-		      else{
-			      headerContainer.css({'position':'','right':'', left:'0', 'margin-top':$(document).scrollTop(),'top':''});
-			      $('#wrapper').css('margin-top', '');
-		      }
-	      }
 
         this.init();
     }
