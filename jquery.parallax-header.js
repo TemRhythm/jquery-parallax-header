@@ -45,63 +45,46 @@
         var meta = this.$el.data(name + '-opts');
         this.opts = $.extend(this._defaults, options, meta);
 
-	      var contentWrapper = $(this.options.contentWrapper);
-		    var toggleHeader = function(needFixHeader){
-			    if(needFixHeader){
-				    headerContainer.css({'position':'fixed','right':'0','left':'0','margin-top':'','top':0, 'z-index':''});
-				    contentWrapper.css('margin-top', +$(document).scrollTop() + +minHeaderHeight + 'px');
-			    }
-			    else{
-				    headerContainer.css({'position':'relative','right':'', left:'0', 'margin-top':$(document).scrollTop(),'top':'', 'z-index':'1'});
-				    contentWrapper.css('margin-top', '');
-			    }
-		    }
+        var contentWrapper = $(this.options.contentWrapper);
 
-		    var headerContainer= this.$el;
-	      var headerContainerOrigHeight = this.$el.height();
-	      var minHeaderHeight = this.options.minHeight;
-	      var headerContainerHeightDiff = headerContainerOrigHeight - minHeaderHeight;
-	      var headerShadowColor = this.options.headerShadowColor;
-	      var shadowContainer = $('<div class="shadowCont"></div>');
-	      headerContainer.css('position', 'relative');
-	      shadowContainer.css({'background-color': headerShadowColor,
-		                          'position': 'absolute',
-		                          'opacity': 0,
-		                          'right': 0,
-	                            'bottom': 0,
-	                            'width': '100%',
-	                            'height': '100%',
-	                            'z-index': '-1'});
-	      headerContainer.append(shadowContainer);
-	      headerContainer.css('overflow','hidden');
-		    var lastScrollPos = $(document).scrollTop();
-	      var triggerScrollPos = 0;
-		    $(document).scroll(function(){
-			    var scrollPos = $(this).scrollTop();
-			    //console.log(scrollPos);
-			    var nextHeaderContainerHeight = 0;
-			    if(scrollPos>=0){
-				    if(scrollPos <= triggerScrollPos || triggerScrollPos == 0){
-					    if(headerContainer.height() > headerContainerOrigHeight)
-					      nextHeaderContainerHeight = headerContainerOrigHeight;
-					    else
-					      nextHeaderContainerHeight = headerContainer.height() + lastScrollPos - scrollPos;
-					    if(nextHeaderContainerHeight > minHeaderHeight){
-						    toggleHeader(false);
-						    headerContainer.height(nextHeaderContainerHeight);
-						    headerContainer.css('margin-top',scrollPos);
-						    triggerScrollPos = 0;
-					    }
-					    else if(headerContainer.height() != minHeaderHeight){
-					      headerContainer.height(minHeaderHeight);
-					      toggleHeader(true);
-						    triggerScrollPos = scrollPos;
-					    }
-				    }
-				    lastScrollPos = scrollPos;
-				    shadowContainer.css('opacity', 1 - nextHeaderContainerHeight/headerContainerHeightDiff);
-				    }
-		    });
+
+        var headerContainer= this.$el;
+          var headerContainerOrigHeight = this.$el.height();
+          var minHeaderHeight = this.options.minHeight;
+          var headerShadowColor = this.options.headerShadowColor;
+          var shadowContainer = $('<div class="shadowCont"></div>');
+
+        contentWrapper.css('margin-top', +headerContainer.height() + 'px');
+        if(contentWrapper.css('background-color') == 'rgba(0, 0, 0, 0)' || contentWrapper.css('background-image') == 'none')
+            contentWrapper.css('background-color', '#FFFFFF');
+
+          headerContainer.css({'position': 'fixed',
+            'z-index': '-1',
+              'top':'0',
+              'right':'0',
+              'left':'0',
+              overflow: 'hidden'
+          });
+          shadowContainer.css({'background-color': headerShadowColor,
+                                  'position': 'absolute',
+                                  'opacity': 0,
+                                  'right': 0,
+                                'bottom': 0,
+                                'width': '100%',
+                                'height': '100%',
+                                'z-index': '-1'});
+          headerContainer.append(shadowContainer);
+            var headerPaddingY = headerContainer.outerHeight() - headerContainer.height();
+            $(document).scroll(function(){
+                var scrollPos = $(document).scrollTop();
+                shadowContainer.css('opacity', scrollPos/headerContainer.height());
+                if(scrollPos >= headerContainerOrigHeight - minHeaderHeight - headerPaddingY){
+                    headerContainer.css({'z-index':'1', 'height': minHeaderHeight + 'px'});
+                }
+                else{
+                    headerContainer.css({'z-index':'-1', 'height': headerContainerOrigHeight + 'px'});
+                }
+            });
 
         this.init();
     }
